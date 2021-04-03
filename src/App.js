@@ -68,21 +68,29 @@ function App() {
         let phone = document.getElementById(`student-phone-${id}`).value;
         if ( validate(name, email)) {
             setIsValid(true)
-            newStudentLists.push(
-                {
-                    id: shortid.generate(),
-                    name: name,
-                    birth: birth,
-                    email: email,
-                    phone: phone
-                }
-            )
+            let newStudent = {
+                id: shortid.generate(),
+                name: name,
+                birth: birth,
+                email: email,
+                phone: phone
+            }
+            newStudentLists.push(newStudent)
+            fetch("https://api-students-2109.herokuapp.com/students", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newStudent)
+            }).then(res => {
+                console.log("Request complete! response:", res);
+            });
             setStudents(newStudentLists);
             handleClose()
         } else {
             setIsValid(false)
         }
-
     }
 
     function updateStudent(event, id) {
@@ -95,6 +103,24 @@ function App() {
             let email = document.getElementById(`student-email-${id}`).value;
             let phone = document.getElementById(`student-phone-${id}`).value;
             if(validate(name, email)) {
+                setIsValid(true)
+                let updatedStudent = {
+                    id: id,
+                    name: name,
+                    birth: birth,
+                    email: email,
+                    phone: phone
+                }
+                fetch(`https://api-students-2109.herokuapp.com/students/${id}`, {
+                    method: "PUT",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedStudent)
+                }).then(res => {
+                    console.log("Request complete! response:", res);
+                });
                 newStudentLists[index].name = name;
                 newStudentLists[index].email = email;
                 newStudentLists[index].birth = birth;
@@ -112,6 +138,11 @@ function App() {
         let selectedStudent = findById(id);
         let index = students.indexOf(selectedStudent);
         if (index > -1) {
+            fetch(`https://api-students-2109.herokuapp.com/students/${id}`, {
+                method: "DELETE",
+            }).then(res => {
+                console.log("Request complete! response:", res);
+            });
             setStudents(students => students.filter(student => student.id !== selectedStudent.id))
         }
         handleClose()
