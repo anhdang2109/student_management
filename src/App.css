@@ -4,6 +4,10 @@ h2 {
     margin-bottom: 20px;
 }
 
+ul {
+    margin-bottom: 0 !important;
+}
+
 .btn {
     margin-right: 20px;
 }

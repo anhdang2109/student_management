@@ -1,6 +1,7 @@
 import {Alert} from "react-bootstrap";
 
 function FormModal({
+                       errors,
                        isValid,
                        closeModal,
                        submitModal,
@@ -9,6 +10,7 @@ function FormModal({
                        buttonContext,
                        selectedStudent
                    }) {
+    let errorMessage = errors.map(error => <li>{error}</li>)
     return (
         <div>
             <div className="modal-content">
@@ -21,10 +23,15 @@ function FormModal({
                     </button>
                 </div>
                 <div className="modal-body">
-                    {!isValid && <Alert variant={'danger'}>Tên và email không được bỏ trống</Alert>}
+                    {!isValid &&
+                    <Alert variant={'danger'}>
+                        <ul>
+                            {errorMessage}
+                        </ul>
+                    </Alert>}
                     <form>
                         <div className="form-group">
-                            <label htmlFor="student-name" className="col-form-label">Họ tên:</label>
+                            <label htmlFor="student-name" className="col-form-label">Họ tên (*):</label>
                             <input id={'student-name-' + selectedStudent.id} type="text" className="form-control"
                                    defaultValue={selectedStudent.name || ''}/>
                         </div>
@@ -34,7 +41,7 @@ function FormModal({
                                    defaultValue={selectedStudent.birth || ''}/>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="student-email" className="col-form-label">Email:</label>
+                            <label htmlFor="student-email" className="col-form-label">Email (*):</label>
                             <input id={'student-email-' + selectedStudent.id} type="text" className="form-control"
                                    defaultValue={selectedStudent.email || ''}/>
                         </div>

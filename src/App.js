@@ -28,6 +28,7 @@ function App() {
 
     // Form
     const [isValid, setIsValid] = useState(true)
+    const [errors, setErrors] = useState([])
 
 
     // Component's life-cycle
@@ -66,7 +67,7 @@ function App() {
         let birth = document.getElementById(`student-birth-${id}`).value;
         let email = document.getElementById(`student-email-${id}`).value;
         let phone = document.getElementById(`student-phone-${id}`).value;
-        if ( validate(name, email)) {
+        if (validate(name, email)) {
             setIsValid(true)
             let newStudent = {
                 id: shortid.generate(),
@@ -102,7 +103,7 @@ function App() {
             let birth = document.getElementById(`student-birth-${id}`).value;
             let email = document.getElementById(`student-email-${id}`).value;
             let phone = document.getElementById(`student-phone-${id}`).value;
-            if(validate(name, email)) {
+            if (validate(name, email)) {
                 setIsValid(true)
                 let updatedStudent = {
                     id: id,
@@ -120,13 +121,13 @@ function App() {
                     body: JSON.stringify(updatedStudent)
                 }).then(res => {
                     console.log("Request complete! response:", res);
+                    newStudentLists[index].name = name;
+                    newStudentLists[index].email = email;
+                    newStudentLists[index].birth = birth;
+                    newStudentLists[index].phone = phone;
+                    setStudents(newStudentLists);
+                    handleClose()
                 });
-                newStudentLists[index].name = name;
-                newStudentLists[index].email = email;
-                newStudentLists[index].birth = birth;
-                newStudentLists[index].phone = phone;
-                setStudents(newStudentLists);
-                handleClose()
             } else {
                 setIsValid(false)
             }
@@ -370,8 +371,20 @@ function App() {
     }
 
     // Validation
-    function validate(name,email) {
-        return !(name === '' || email === '');
+    function validate(name, email) {
+        let newErrors = [];
+        let noError = true;
+        if (name === '') {
+            newErrors.push('Tên không được bỏ trống')
+            setErrors(newErrors)
+            noError = false
+        }
+        if (!(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email))) {
+            newErrors.push('Email không hợp lệ')
+            setErrors(newErrors)
+            noError = false
+        }
+        return noError;
     }
 
     // Component's view
@@ -404,6 +417,7 @@ function App() {
                     show={show}
                     onHide={handleClose}>
                     {create && <FormModal
+                        errors={errors}
                         isValid={isValid}
                         title={'Thêm sinh viên'}
                         buttonClass={'success'}
@@ -412,6 +426,7 @@ function App() {
                         submitModal={createStudent}
                         closeModal={closeModal}/>}
                     {edit && <FormModal
+                        errors={errors}
                         isValid={isValid}
                         title={'Sửa sinh viên'}
                         buttonClass={'primary'}
