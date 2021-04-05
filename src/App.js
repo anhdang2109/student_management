@@ -2,10 +2,10 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Button, Modal} from "react-bootstrap";
 import {useEffect, useState} from "react";
-import shortid from "shortid";
 import ListStudent from "./components/list";
 import FormModal from "./components/form";
 import ConfirmModal from "./components/confirm";
+
 
 function App() {
 
@@ -29,6 +29,7 @@ function App() {
     // Form
     const [isValid, setIsValid] = useState(true)
     const [errors, setErrors] = useState([])
+
 
 
     // Component's life-cycle
@@ -61,34 +62,45 @@ function App() {
         return result;
     }
 
-    function createStudent(event, id) {
+    function updateData(field, value) {
+        const _ = require('lodash');
+        let newStudent = _.cloneDeep(selectedStudent)
+        if (field === 'name') {
+            newStudent.name = value
+            setSelectedStudent(newStudent)
+        }
+        if (field === 'birth') {
+            newStudent.birth = value
+            setSelectedStudent(newStudent)
+        }
+        if (field === 'email') {
+            newStudent.email = value
+            setSelectedStudent(newStudent)
+        }
+        if (field === 'phone') {
+            newStudent.phone = value
+            setSelectedStudent(newStudent)
+        }
+    }
+
+    function createStudent() {
         let newStudentLists = [...students]
-        let name = document.getElementById(`student-name-${id}`).value;
-        let birth = document.getElementById(`student-birth-${id}`).value;
-        let email = document.getElementById(`student-email-${id}`).value;
-        let phone = document.getElementById(`student-phone-${id}`).value;
-        if (validate(name, email)) {
+        if (validate(selectedStudent.name, selectedStudent.email)) {
             setIsValid(true)
-            let newStudent = {
-                id: shortid.generate(),
-                name: name,
-                birth: birth,
-                email: email,
-                phone: phone
-            }
-            newStudentLists.push(newStudent)
             fetch("https://api-students-2109.herokuapp.com/students", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newStudent)
+                body: JSON.stringify(selectedStudent)
             }).then(res => {
                 console.log("Request complete! response:", res);
+                newStudentLists.push(selectedStudent)
+                setStudents(newStudentLists);
+                handleClose()
             });
-            setStudents(newStudentLists);
-            handleClose()
+
         } else {
             setIsValid(false)
         }
@@ -99,32 +111,21 @@ function App() {
         let index = students.indexOf(findById(id));
         if (index > -1) {
             let newStudentLists = [...students]
-            let name = document.getElementById(`student-name-${id}`).value;
-            let birth = document.getElementById(`student-birth-${id}`).value;
-            let email = document.getElementById(`student-email-${id}`).value;
-            let phone = document.getElementById(`student-phone-${id}`).value;
-            if (validate(name, email)) {
+            if (validate(selectedStudent.name, selectedStudent.email)) {
                 setIsValid(true)
-                let updatedStudent = {
-                    id: id,
-                    name: name,
-                    birth: birth,
-                    email: email,
-                    phone: phone
-                }
                 fetch(`https://api-students-2109.herokuapp.com/students/${id}`, {
                     method: "PUT",
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(updatedStudent)
+                    body: JSON.stringify(selectedStudent)
                 }).then(res => {
                     console.log("Request complete! response:", res);
-                    newStudentLists[index].name = name;
-                    newStudentLists[index].email = email;
-                    newStudentLists[index].birth = birth;
-                    newStudentLists[index].phone = phone;
+                    newStudentLists[index].name = selectedStudent.name;
+                    newStudentLists[index].email = selectedStudent.email;
+                    newStudentLists[index].birth = selectedStudent.birth;
+                    newStudentLists[index].phone = selectedStudent.phone;
                     setStudents(newStudentLists);
                     handleClose()
                 });
@@ -423,6 +424,7 @@ function App() {
                         buttonClass={'success'}
                         buttonContext={'Lưu thông tin'}
                         selectedStudent={selectedStudent}
+                        updateData={updateData}
                         submitModal={createStudent}
                         closeModal={closeModal}/>}
                     {edit && <FormModal
@@ -432,6 +434,7 @@ function App() {
                         buttonClass={'primary'}
                         buttonContext={'Cập nhật'}
                         selectedStudent={selectedStudent}
+                        updateData={updateData}
                         submitModal={updateStudent}
                         closeModal={closeModal}/>}
                     {remove && <ConfirmModal

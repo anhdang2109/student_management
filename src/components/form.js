@@ -8,7 +8,8 @@ function FormModal({
                        title,
                        buttonClass,
                        buttonContext,
-                       selectedStudent
+                       selectedStudent,
+                       updateData
                    }) {
     let errorMessage = errors.map(error => <li>{error}</li>)
     return (
@@ -32,22 +33,30 @@ function FormModal({
                     <form>
                         <div className="form-group">
                             <label htmlFor="student-name" className="col-form-label">Họ tên (*):</label>
-                            <input id={'student-name-' + selectedStudent.id} type="text" className="form-control"
+                            <input id={'student-name-' + selectedStudent.id}
+                                   type="text" className="form-control"
+                                   onChange={(event) => updateData('name',event.target.value)}
                                    defaultValue={selectedStudent.name || ''}/>
                         </div>
                         <div className="form-group">
                             <label htmlFor="student-birth" className="col-form-label">Ngày sinh:</label>
-                            <input id={'student-birth-' + selectedStudent.id} type="text" className="form-control"
+                            <input id={'student-birth-' + selectedStudent.id}
+                                   type="text" className="form-control"
+                                   onChange={(event) => updateData('birth',event.target.value)}
                                    defaultValue={selectedStudent.birth || ''}/>
                         </div>
                         <div className="form-group">
                             <label htmlFor="student-email" className="col-form-label">Email (*):</label>
-                            <input id={'student-email-' + selectedStudent.id} type="text" className="form-control"
+                            <input id={'student-email-' + selectedStudent.id}
+                                   type="text" className="form-control"
+                                   onChange={(event) => updateData('email',event.target.value)}
                                    defaultValue={selectedStudent.email || ''}/>
                         </div>
                         <div className="form-group">
                             <label htmlFor="student-phone" className="col-form-label">Số điện thoại:</label>
-                            <input id={'student-phone-' + selectedStudent.id} type="text" className="form-control"
+                            <input id={'student-phone-' + selectedStudent.id}
+                                   type="text" className="form-control"
+                                   onChange={(event) => updateData('phone',event.target.value)}
                                    defaultValue={selectedStudent.phone || ''}/>
                         </div>
                     </form>
