@@ -10,6 +10,7 @@ function ListStudent({
                          sortByBirth,
                          sortByEmail,
                          sortByPhone,
+                         _DATA
                      }) {
 
     // Sort icon
@@ -19,7 +20,7 @@ function ListStudent({
     let sortPhoneIcon;
 
     // Student list view
-    let studentLists = students.map(student => <tr key={student.id}>
+    let studentLists = _DATA.currentData().map(student => <tr key={student.id}>
         <td>{student.name}</td>
         <td>{student.birth}</td>
         <td>{student.email}</td>

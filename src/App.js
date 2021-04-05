@@ -5,9 +5,14 @@ import {useEffect, useState} from "react";
 import ListStudent from "./components/list";
 import FormModal from "./components/form";
 import ConfirmModal from "./components/confirm";
+import usePagination from "./components/pagination";
+import {Pagination} from "@material-ui/lab";
 
 
 function App() {
+
+    // Third party library
+    const _ = require('lodash');
 
     // Student variable
     const [initialStudents, setInitialStudents] = useState([]);
@@ -30,7 +35,16 @@ function App() {
     const [isValid, setIsValid] = useState(true)
     const [errors, setErrors] = useState([])
 
+    let [page, setPage] = useState(1);
+    const PER_PAGE = 5;
 
+    const count = Math.ceil(students.length / PER_PAGE);
+    const _DATA = usePagination(students, PER_PAGE);
+
+    const handleChange = (e, p) => {
+        setPage(p);
+        _DATA.jump(p);
+    };
 
     // Component's life-cycle
     useEffect(() => {
@@ -63,7 +77,6 @@ function App() {
     }
 
     function updateData(field, value) {
-        const _ = require('lodash');
         let newStudent = _.cloneDeep(selectedStudent)
         if (field === 'name') {
             newStudent.name = value
@@ -404,6 +417,7 @@ function App() {
             <section id="table">
                 <ListStudent
                     students={students}
+                    _DATA={_DATA}
                     sortName={sortName}
                     sortBirth={sortBirth}
                     sortEmail={sortEmail}
@@ -414,6 +428,16 @@ function App() {
                     sortByBirth={sortByBirth}
                     sortByEmail={sortByEmail}
                     sortByPhone={sortByPhone}/>
+                    <br/>
+                        <Pagination
+
+                            count={count}
+                            size="large"
+                            page={page}
+                            variant="outlined"
+                            shape="rounded"
+                            onChange={handleChange}
+                        />
                 <Modal
                     show={show}
                     onHide={handleClose}>
