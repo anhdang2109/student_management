@@ -27,6 +27,7 @@ function Login() {
         } catch (err) {
             setIsError(true);
             console.log("Login fail")
+            history.push("/login");
             console.log(err)
         }
     }

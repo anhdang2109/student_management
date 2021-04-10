@@ -5,7 +5,7 @@ import FormModal from "./form";
 import ConfirmModal from "./confirm";
 import React, {useEffect, useState} from "react";
 import usePagination from "./pagination";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import {deleteStudent, getStudents, saveStudent} from "../../api/api";
 
 function Students() {
@@ -386,78 +386,83 @@ function Students() {
         return noError;
     }
 
-    return (<div className="container">
-        <Link to="/login">
-            <button className="btn btn-primary">Login</button>
-        </Link>
-        <Link to="/profile">
-            <button className="btn btn-primary">Profile</button>
-        </Link>
-        <hr/>
-        <section id="header">
-            <h2>Danh sách học viên</h2>
-            <Button variant="success"
-                    onClick={(event) => openCreate(event)}>
-                <i className="fa fa-plus-circle" aria-hidden="true"/>
-                Thêm học viên
-            </Button>
-            <br/>
-            <br/>
-        </section>
-        <section id="table">
-            <ListStudent
-                students={students}
-                _DATA={_DATA}
-                sortName={sortName}
-                sortBirth={sortBirth}
-                sortEmail={sortEmail}
-                sortPhone={sortPhone}
-                openEdit={openEdit}
-                openRemove={openRemove}
-                sortByName={sortByName}
-                sortByBirth={sortByBirth}
-                sortByEmail={sortByEmail}
-                sortByPhone={sortByPhone}/>
-            <br/>
-            <Pagination
+    return (
+        <div>
+            {localStorage.getItem("token") ?
+                <div className="container">
+                    <Link to="/login">
+                        <button className="btn btn-primary">Login</button>
+                    </Link>
+                    <Link to="/profile">
+                        <button className="btn btn-primary">Profile</button>
+                    </Link>
+                    <hr/>
+                    <section id="header">
+                        <h2>Danh sách học viên</h2>
+                        <Button variant="success"
+                                onClick={(event) => openCreate(event)}>
+                            <i className="fa fa-plus-circle" aria-hidden="true"/>
+                            Thêm học viên
+                        </Button>
+                        <br/>
+                        <br/>
+                    </section>
+                    <section id="table">
+                        <ListStudent
+                            students={students}
+                            _DATA={_DATA}
+                            sortName={sortName}
+                            sortBirth={sortBirth}
+                            sortEmail={sortEmail}
+                            sortPhone={sortPhone}
+                            openEdit={openEdit}
+                            openRemove={openRemove}
+                            sortByName={sortByName}
+                            sortByBirth={sortByBirth}
+                            sortByEmail={sortByEmail}
+                            sortByPhone={sortByPhone}/>
+                        <br/>
+                        <Pagination
 
-                count={count}
-                size="large"
-                page={page}
-                variant="outlined"
-                shape="rounded"
-                onChange={handleChange}
-            />
-            <Modal
-                show={show}
-                onHide={handleClose}>
-                {create && <FormModal
-                    errors={errors}
-                    isValid={isValid}
-                    title={'Thêm sinh viên'}
-                    buttonClass={'success'}
-                    buttonContext={'Lưu thông tin'}
-                    selectedStudent={selectedStudent}
-                    updateData={updateData}
-                    submitModal={createStudent}
-                    closeModal={closeModal}/>}
-                {edit && <FormModal
-                    errors={errors}
-                    isValid={isValid}
-                    title={'Sửa sinh viên'}
-                    buttonClass={'primary'}
-                    buttonContext={'Cập nhật'}
-                    selectedStudent={selectedStudent}
-                    updateData={updateData}
-                    submitModal={updateStudent}
-                    closeModal={closeModal}/>}
-                {remove && <ConfirmModal
-                    selectedStudent={selectedStudent}
-                    removeStudent={removeStudent}
-                    closeModal={closeModal}/>}
-            </Modal>
-        </section>
-    </div>);
+                            count={count}
+                            size="large"
+                            page={page}
+                            variant="outlined"
+                            shape="rounded"
+                            onChange={handleChange}
+                        />
+                        <Modal
+                            show={show}
+                            onHide={handleClose}>
+                            {create && <FormModal
+                                errors={errors}
+                                isValid={isValid}
+                                title={'Thêm sinh viên'}
+                                buttonClass={'success'}
+                                buttonContext={'Lưu thông tin'}
+                                selectedStudent={selectedStudent}
+                                updateData={updateData}
+                                submitModal={createStudent}
+                                closeModal={closeModal}/>}
+                            {edit && <FormModal
+                                errors={errors}
+                                isValid={isValid}
+                                title={'Sửa sinh viên'}
+                                buttonClass={'primary'}
+                                buttonContext={'Cập nhật'}
+                                selectedStudent={selectedStudent}
+                                updateData={updateData}
+                                submitModal={updateStudent}
+                                closeModal={closeModal}/>}
+                            {remove && <ConfirmModal
+                                selectedStudent={selectedStudent}
+                                removeStudent={removeStudent}
+                                closeModal={closeModal}/>}
+                        </Modal>
+                    </section>
+                </div> :
+                <Redirect from='/' to='/login'/>}
+        </div>);
 }
 
 export default Students

@@ -39,7 +39,6 @@ export function deleteStudent(student) {
 }
 
 // login
-
 export function checkLogin(loginEmail, loginPassword) {
     const url = '/login'
     const data = {
