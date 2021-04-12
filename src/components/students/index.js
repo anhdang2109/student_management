@@ -5,12 +5,15 @@ import FormModal from "./form";
 import ConfirmModal from "./confirm";
 import React, {useEffect, useState} from "react";
 import usePagination from "./pagination";
-import {Link, Redirect} from "react-router-dom";
-import {deleteStudent, getStudents, saveStudent} from "../../api/api";
+import {Link, Redirect, useHistory} from "react-router-dom";
+import { withRouter } from "react-router";
+import {deleteStudent, getStudent, getStudents, saveStudent} from "../../api/api";
+import _ from 'lodash'
 
-function Students() {
-    // Third party library
-    const _ = require('lodash');
+function Students(props) {
+    const history = useHistory();
+    const id = localStorage.getItem('id')
+    const [user,setUser] = useState({})
 
 
     // Student variable
@@ -54,13 +57,30 @@ function Students() {
                     setInitialStudents(res.data)
                     setStudents(res.data)
                 }
+                console.log(res)
             } catch (err) {
-                console.log(err.message)
-                setInitialStudents([])
-                setStudents([])
+                if (err.response.status === 401) props.history.push("/login")
+                alert("token het han")
             }
         })();
-    }, [])
+        (async function () {
+            try {
+                const res = await getStudent(id);
+                if (res.status === 200) {
+                    setUser(res.data)
+                }
+                console.log(res)
+            } catch (err) {
+                if (err.response.status === 401) props.history.push("/login")
+                alert("token het han")
+            }
+        })();
+    }, [props.history, id])
+
+    function logout() {
+        localStorage.removeItem("token");
+        history.push("/login")
+    }
 
     // Student CRUD function
     function findById(id) {
@@ -91,7 +111,8 @@ function Students() {
                         handleClose()
                     }
                 } catch (err) {
-                    console.log(err.message)
+                    if (err.response.status === 401) props.history.push("/login")
+                    alert("token het han")
                 }
             })();
         } else {
@@ -119,7 +140,8 @@ function Students() {
                             handleClose()
                         }
                     } catch (err) {
-                        console.log(err.message)
+                        if (err.response.status === 401) props.history.push("/login")
+                        alert("token het han")
                     }
                 })();
             } else {
@@ -141,7 +163,8 @@ function Students() {
                         setStudents(students => students.filter(student => student.id !== selectedStudent.id))
                     }
                 } catch (err) {
-                    console.log(err.message)
+                    if (err.response.status === 401) props.history.push("/login")
+                    alert("token het han")
                 }
             })();
         }
@@ -388,81 +411,82 @@ function Students() {
 
     return (
         <div>
-            {localStorage.getItem("token") ?
-                <div className="container">
-                    <Link to="/login">
-                        <button className="btn btn-primary">Login</button>
-                    </Link>
-                    <Link to="/profile">
-                        <button className="btn btn-primary">Profile</button>
-                    </Link>
-                    <hr/>
-                    <section id="header">
-                        <h2>Danh sách học viên</h2>
-                        <Button variant="success"
-                                onClick={(event) => openCreate(event)}>
-                            <i className="fa fa-plus-circle" aria-hidden="true"/>
-                            Thêm học viên
-                        </Button>
-                        <br/>
-                        <br/>
-                    </section>
-                    <section id="table">
-                        <ListStudent
-                            students={students}
-                            _DATA={_DATA}
-                            sortName={sortName}
-                            sortBirth={sortBirth}
-                            sortEmail={sortEmail}
-                            sortPhone={sortPhone}
-                            openEdit={openEdit}
-                            openRemove={openRemove}
-                            sortByName={sortByName}
-                            sortByBirth={sortByBirth}
-                            sortByEmail={sortByEmail}
-                            sortByPhone={sortByPhone}/>
-                        <br/>
-                        <Pagination
+            { !localStorage.getItem('token') && <Redirect to='/login'/>}
+            <div className="container">
+                <h1>Hello {user.name}</h1>
+                <Link to="/profile">
+                    <button className="btn btn-primary">Profile</button>
+                </Link>
+                <button
+                    onClick={()=>logout()}
+                    className="btn btn-dark">Logout
+                </button>
+                <hr/>
+                <section id="header">
+                    <h2>Danh sách học viên</h2>
+                    <Button variant="success"
+                            onClick={(event) => openCreate(event)}>
+                        <i className="fa fa-plus-circle" aria-hidden="true"/>
+                        Thêm học viên
+                    </Button>
+                    <br/>
+                    <br/>
+                </section>
+                <section id="table">
+                    <ListStudent
+                        students={students}
+                        _DATA={_DATA}
+                        sortName={sortName}
+                        sortBirth={sortBirth}
+                        sortEmail={sortEmail}
+                        sortPhone={sortPhone}
+                        openEdit={openEdit}
+                        openRemove={openRemove}
+                        sortByName={sortByName}
+                        sortByBirth={sortByBirth}
+                        sortByEmail={sortByEmail}
+                        sortByPhone={sortByPhone}/>
+                    <br/>
+                    <Pagination
 
-                            count={count}
-                            size="large"
-                            page={page}
-                            variant="outlined"
-                            shape="rounded"
-                            onChange={handleChange}
-                        />
-                        <Modal
-                            show={show}
-                            onHide={handleClose}>
-                            {create && <FormModal
-                                errors={errors}
-                                isValid={isValid}
-                                title={'Thêm sinh viên'}
-                                buttonClass={'success'}
-                                buttonContext={'Lưu thông tin'}
-                                selectedStudent={selectedStudent}
-                                updateData={updateData}
-                                submitModal={createStudent}
-                                closeModal={closeModal}/>}
-                            {edit && <FormModal
-                                errors={errors}
-                                isValid={isValid}
-                                title={'Sửa sinh viên'}
-                                buttonClass={'primary'}
-                                buttonContext={'Cập nhật'}
-                                selectedStudent={selectedStudent}
-                                updateData={updateData}
-                                submitModal={updateStudent}
-                                closeModal={closeModal}/>}
-                            {remove && <ConfirmModal
-                                selectedStudent={selectedStudent}
-                                removeStudent={removeStudent}
-                                closeModal={closeModal}/>}
-                        </Modal>
-                    </section>
-                </div> :
-                <Redirect from='/' to='/login'/>}
+                        count={count}
+                        size="large"
+                        page={page}
+                        variant="outlined"
+                        shape="rounded"
+                        onChange={handleChange}
+                    />
+                    <Modal
+                        show={show}
+                        onHide={handleClose}>
+                        {create && <FormModal
+                            errors={errors}
+                            isValid={isValid}
+                            title={'Thêm sinh viên'}
+                            buttonClass={'success'}
+                            buttonContext={'Lưu thông tin'}
+                            selectedStudent={selectedStudent}
+                            updateData={updateData}
+                            submitModal={createStudent}
+                            closeModal={closeModal}/>}
+                        {edit && <FormModal
+                            errors={errors}
+                            isValid={isValid}
+                            title={'Sửa sinh viên'}
+                            buttonClass={'primary'}
+                            buttonContext={'Cập nhật'}
+                            selectedStudent={selectedStudent}
+                            updateData={updateData}
+                            submitModal={updateStudent}
+                            closeModal={closeModal}/>}
+                        {remove && <ConfirmModal
+                            selectedStudent={selectedStudent}
+                            removeStudent={removeStudent}
+                            closeModal={closeModal}/>}
+                    </Modal>
+                </section>
+            </div>
         </div>);
 }
 
-export default Students
+export default withRouter(Students)

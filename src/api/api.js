@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const DOMAIN = "https://api-students-2109.herokuapp.com";
+// const DOMAIN = "http://localhost:3000";
 const api = axios.create({
     baseURL: DOMAIN,
     headers: {Authorization: "token"},
@@ -9,12 +10,20 @@ const api = axios.create({
 
 // Get student list
 export function getStudents() {
-    console.log(localStorage.getItem("token"))
     const url = '/students'
     const config = {
         headers: {Authorization: `Bearer ${localStorage.getItem("token")}`},
     }
     return api.get(url, config)
+}
+
+// Get student
+export function getStudent(id) {
+    const url = '/students'
+    const config = {
+        headers: {Authorization: `Bearer ${localStorage.getItem("token")}`},
+    }
+    return api.get(url + `/${id}`, config)
 }
 
 // create & update student

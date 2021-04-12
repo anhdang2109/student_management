@@ -1,12 +1,10 @@
 import {Link} from "react-router-dom";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { useHistory } from "react-router-dom";
 import {Alert} from "react-bootstrap";
 import {checkLogin} from "../../api/api";
 
 function Login() {
-    localStorage.clear();
-
 
     // Login variable
     const [loginEmail, setLoginEmail] = useState("");
@@ -14,14 +12,20 @@ function Login() {
     const [isError, setIsError] = useState(false);
     const history = useHistory();
 
+    // Component's life-cycle
+    useEffect(() => {
+        localStorage.removeItem("token");
+    }, [])
+
 
     async function login(event) {
         event.preventDefault()
         try {
             const res = await checkLogin(loginEmail, loginPassword);
             if (res.status === 200) {
-                const token = res.data.token;
-                localStorage.setItem("token", token);
+                console.log(res)
+                localStorage.setItem("token", res.data.token);
+                localStorage.setItem("id", res.data.id);
                 history.push("/");
             }
         } catch (err) {
@@ -34,8 +38,6 @@ function Login() {
 
     return (<div>
             <h1 className="text-center">Log in</h1>
-
-
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-10">
@@ -58,6 +60,7 @@ function Login() {
                             <div className="col-10">
                                 <input className="form-control shaw rounded"
                                        onChange={(event) => setLoginPassword(event.target.value)}
+                                       type="password"
                                        placeholder="Enter your password"/>
                             </div>
                         </div>

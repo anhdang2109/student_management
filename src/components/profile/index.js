@@ -1,22 +1,47 @@
-import {Link, Redirect} from "react-router-dom";
-import React from "react";
+import {Link, Redirect, useHistory} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {getStudent} from "../../api/api";
+import {withRouter} from "react-router";
 
-function Profile() {
+function Profile(props) {
+    const history = useHistory();
+    const id = localStorage.getItem('id')
+    function logout() {
+        localStorage.removeItem("token");
+        history.push("/login")
+    }
+    const [user,setUser] = useState({})
+
+    // Component's life-cycle
+    useEffect(() => {
+        (async function () {
+            try {
+                const res = await getStudent(id);
+                if (res.status === 200) {
+                    setUser(res.data)
+                }
+                console.log(res)
+            } catch (err) {
+                if (err.response.status === 401) props.history.push("/login")
+                alert("token het han")
+            }
+        })();
+    }, [props.history,id])
+
     return <div>
-        {localStorage.getItem("token") ?
+        { !localStorage.getItem('token') && <Redirect to='/login'/>}
             <div>
-                <Link to="/login">
-                    <button className="btn btn-primary">Login</button>
-                </Link>
+                <h1>Hello {user.name}</h1>
                 <Link to="/">
                     <button className="btn btn-primary">Students</button>
                 </Link>
+                <button
+                    onClick={()=>logout()}
+                    className="btn btn-dark">Logout
+                </button>
                 <hr/>
-                <h1>Profile page</h1>
             </div>
-            :
-            <Redirect from='/' to='/login'/>}
     </div>
 }
 
-export default Profile
+export default withRouter(Profile)
